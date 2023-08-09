@@ -6,7 +6,8 @@ from sys import exit
 from board import Board
 
 pygame.init()
-chess_board = Board(board_dimensions=(800, 800), square_colors=("Yellow", "#ffffff"))
+pygame.display.set_caption("Chess")
+chess_board = Board(board_dimensions=(800, 800), square_colors=("#65aaf7", "#ffffff"))
 
 # currently board size is game size
 game_screen = pygame.display.set_mode(size=(chess_board.board_w, chess_board.board_h))
@@ -15,10 +16,15 @@ game_screen = pygame.display.set_mode(size=(chess_board.board_w, chess_board.boa
 while True:
     # event loop
     for event in pygame.event.get():
-        print(event)
+        # print(event)
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            print(f"--------------mouse button down at {event.pos}------------")
+            clicked_square = chess_board.get_clicked_square(event.pos)
+            clicked_square.surface.fill("#5e1717")
+            game_screen.blit(clicked_square.surface, clicked_square.rectangle)
 
     # draw the board squares
     chess_board.draw_board_layout(game_screen)

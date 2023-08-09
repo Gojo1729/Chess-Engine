@@ -3,9 +3,6 @@ import pygame
 from pygame import Surface
 from pygame import Rect
 
-color_1_surface: Surface = pygame.Surface((100, 100))
-color_2_surface: Surface = pygame.Surface((100, 100))
-
 
 class _Square:
     """
@@ -15,7 +12,7 @@ class _Square:
     """
 
     def __init__(self, notation: str):
-        self.surface = None
+        self.surface: Surface = None
         self.rectangle = None
         self.color = None
         self.notation = notation
@@ -30,14 +27,18 @@ class Board:
     def __init__(
         self, board_dimensions: tuple[int, int], square_colors: tuple[str, str]
     ):
-        global color_1_surface, color_2_surface
+        # self.color_1_surface: Surface = pygame.Surface((100, 100))
+        # self.color_2_surface: Surface = pygame.Surface((100, 100))
         self.board_dimensions = board_dimensions
-        self.square_colors = square_colors
-        self.n_rows = 8
-        self.n_cols = 8
-        color_1_surface.fill(square_colors[0])
-        color_2_surface.fill(square_colors[1])
         self.board_w, self.board_h = self.board_dimensions
+        self.square_colors = square_colors
+        self.n_rows, self.n_cols = 8, 8
+        self.square_w, self.square_h = (
+            self.board_w // self.n_cols,
+            self.board_h // self.n_rows,
+        )
+        self.files = list("abcdefgh")
+        self.ranks = list("12345678")
         self.squares = self._precompute_squares()
         print(f"list of squares {len(self.squares)}")
 
@@ -46,22 +47,21 @@ class Board:
         Create a matrix of squares with properties -> rectangle, name, color
         """
         squares = {}
-        files = list("abcdefgh")
-        ranks = list("12345678")
-        global color_1_surface, color_2_surface
-        for rank_index, rank_square in enumerate(ranks):
-            for file_index, file_square in enumerate(files):
+        for rank_index, rank_square in enumerate(self.ranks):
+            for file_index, file_square in enumerate(self.files):
                 sq = _Square(notation=f"{file_square}{rank_square}")
                 if (rank_index + file_index) % 2 == 0:
                     sq.color = self.square_colors[0]
-                    sq.surface = color_1_surface
-                    sq.rectangle = color_1_surface.get_rect(
+                    sq.surface = pygame.Surface((100, 100))
+                    sq.surface.fill(sq.color)
+                    sq.rectangle = sq.surface.get_rect(
                         topleft=(file_index * 100, rank_index * 100)
                     )
                 else:
                     sq.color = self.square_colors[1]
-                    sq.surface = color_2_surface
-                    sq.rectangle = color_2_surface.get_rect(
+                    sq.surface = pygame.Surface((100, 100))
+                    sq.surface.fill(sq.color)
+                    sq.rectangle = sq.surface.get_rect(
                         topleft=(file_index * 100, rank_index * 100)
                     )
                 squares[f"{sq.notation}"] = sq
@@ -78,6 +78,24 @@ class Board:
             screen_surface.blit(square.surface, square.rectangle)
 
         # screen_surface.fill(self.square_colors[1], screen_surface.get_rect())
+
+    def get_clicked_square(self, clicked_mouse_pos) -> _Square:
+        """
+        clicked_mouse_pos -> position (X,Y) of MOUSEBUTTONDOWN event
+        returns Square object containing (X,Y)
+
+        Instead of doing linear search on all the squares and finding whether the point
+        is inside it or not, we can use the (X,Y) and find out which rank and file does it correspond
+        to as we know the dimensions of each square. X will give you the file, Y will give you the rank
+        """
+        clicked_file = clicked_mouse_pos[0] // self.square_w
+        clicked_rank = clicked_mouse_pos[1] // self.square_h
+
+        print(
+            f"Clicked column {clicked_file}, file {self.files[clicked_file]}, clicked row {clicked_rank}, rank {self.ranks[clicked_rank]}"
+        )
+        selected_square = f"{self.files[clicked_file]}{self.ranks[clicked_rank]}"
+        return self.squares[selected_square]
 
     def get_square_center(self, notation):
         return self.squares[notation].notation, self.squares[notation].rectangle.center
