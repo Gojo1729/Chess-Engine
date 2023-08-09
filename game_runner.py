@@ -4,6 +4,7 @@ from sys import exit
 
 # custom classes import
 from board import Board
+from game_state import GameState
 
 pygame.init()
 pygame.display.set_caption("Chess")
@@ -23,7 +24,16 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             print(f"--------------mouse button down at {event.pos}------------")
             clicked_square = chess_board.get_clicked_square(event.pos)
-            clicked_square.surface.fill("#5e1717")
+            previously_clicked_square = GameState.previously_clicked_square
+            previously_clicked_square = GameState.currently_clicked_square
+            GameState.currently_clicked_square = clicked_square
+            clicked_square.surface.fill("#183ca8")
+            if previously_clicked_square is not None:
+                previously_clicked_square.surface.fill(previously_clicked_square.color)
+                game_screen.blit(
+                    previously_clicked_square.surface,
+                    previously_clicked_square.rectangle,
+                )
             game_screen.blit(clicked_square.surface, clicked_square.rectangle)
 
     # draw the board squares

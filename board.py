@@ -4,7 +4,7 @@ from pygame import Surface
 from pygame import Rect
 
 
-class _Square:
+class Square:
     """
     color
     name -> in chess format - columns from a-h, rows 1-8 from white's point of view
@@ -49,7 +49,7 @@ class Board:
         squares = {}
         for rank_index, rank_square in enumerate(self.ranks):
             for file_index, file_square in enumerate(self.files):
-                sq = _Square(notation=f"{file_square}{rank_square}")
+                sq = Square(notation=f"{file_square}{rank_square}")
                 if (rank_index + file_index) % 2 == 0:
                     sq.color = self.square_colors[0]
                     sq.surface = pygame.Surface((100, 100))
@@ -79,7 +79,7 @@ class Board:
 
         # screen_surface.fill(self.square_colors[1], screen_surface.get_rect())
 
-    def get_clicked_square(self, clicked_mouse_pos) -> _Square:
+    def get_clicked_square(self, clicked_mouse_pos) -> Square:
         """
         clicked_mouse_pos -> position (X,Y) of MOUSEBUTTONDOWN event
         returns Square object containing (X,Y)
