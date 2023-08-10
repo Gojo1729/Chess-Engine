@@ -11,14 +11,15 @@ pygame.display.set_caption("Chess")
 clock = pygame.time.Clock()
 chess_board = Board(board_dimensions=(800, 800), square_colors=("#65aaf7", "#ffffff"))
 
-# currently board size is game size
+# currently board size is game size, init the game screen and the boards
 game_screen = pygame.display.set_mode(size=(chess_board.board_w, chess_board.board_h))
+chess_board.compute_squares()
 
 
 while True:
     # event loop
     for event in pygame.event.get():
-        print(event)
+        # print(event)
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()

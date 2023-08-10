@@ -39,6 +39,8 @@ class Board:
         )
         self.files = list("abcdefgh")
         self.ranks = list("12345678")
+
+    def compute_squares(self):
         self.squares = self._precompute_squares()
         print(f"list of squares {len(self.squares)}")
 
@@ -52,18 +54,16 @@ class Board:
                 sq = Square(notation=f"{file_square}{rank_square}")
                 if (rank_index + file_index) % 2 == 0:
                     sq.color = self.square_colors[0]
-                    sq.surface = pygame.Surface((100, 100))
-                    sq.surface.fill(sq.color)
-                    sq.rectangle = sq.surface.get_rect(
-                        topleft=(file_index * 100, rank_index * 100)
-                    )
                 else:
                     sq.color = self.square_colors[1]
-                    sq.surface = pygame.Surface((100, 100))
-                    sq.surface.fill(sq.color)
-                    sq.rectangle = sq.surface.get_rect(
-                        topleft=(file_index * 100, rank_index * 100)
-                    )
+
+                sq.surface = pygame.Surface(
+                    (self.square_w, self.square_h)
+                ).convert_alpha()
+                sq.surface.fill(sq.color)
+                sq.rectangle = sq.surface.get_rect(
+                    topleft=(file_index * self.square_w, rank_index * self.square_h)
+                )
                 squares[f"{sq.notation}"] = sq
 
         return squares
@@ -72,8 +72,6 @@ class Board:
         """
         Draws the squares with alternative color
         """
-        square_w = int(self.board_w / 8)
-        square_h = int(self.board_h / 8)
         for square in self.squares.values():
             screen_surface.blit(square.surface, square.rectangle)
 
