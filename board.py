@@ -1,7 +1,8 @@
 # Handles the board design and square
 import pygame
 from pygame import Surface
-from pygame import Rect
+
+import constants
 
 
 class Square:
@@ -37,8 +38,8 @@ class Board:
             self.board_w // self.n_cols,
             self.board_h // self.n_rows,
         )
-        self.files = list("abcdefgh")
-        self.ranks = list("12345678")
+        self.files = constants.files
+        self.ranks = constants.ranks
 
     def compute_squares(self):
         self.squares = self._precompute_squares()
@@ -96,4 +97,4 @@ class Board:
         return self.squares[selected_square]
 
     def get_square_center(self, notation):
-        return self.squares[notation].notation, self.squares[notation].rectangle.center
+        return self.squares[notation].rectangle.center
