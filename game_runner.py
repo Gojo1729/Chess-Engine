@@ -5,7 +5,7 @@ from sys import exit
 # custom classes import
 from board import Board
 from game_state import GameState
-from pieces import Side
+from pieces import LightSide, DarkSide
 import constants
 
 pygame.init()
@@ -17,7 +17,8 @@ chess_board = Board(board_dimensions=(800, 800), square_colors=("#65aaf7", "#fff
 game_screen = pygame.display.set_mode(size=(chess_board.board_w, chess_board.board_h))
 chess_board.compute_squares()
 
-light_side = Side("#000000")
+light_side = LightSide({"name": "light", "color": "#000000"})
+dark_side = DarkSide({"name": "dark", "color": "#111111"})
 
 
 while True:
@@ -43,10 +44,12 @@ while True:
             game_screen.blit(clicked_square.surface, clicked_square.rectangle)
             # test for pawn movement in default setup i.e move forwards, not taking another piece and shifting files
             light_side.move_pawn(chess_board)
+            dark_side.move_pawn(chess_board)
 
     # draw the board squares
     chess_board.draw_board_layout(game_screen)
     light_side.draw_pawns(game_screen, chess_board)
+    dark_side.draw_pawns(game_screen, chess_board)
 
     pygame.display.update()
     clock.tick(60)
