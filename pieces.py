@@ -21,8 +21,19 @@ class Piece(ABC):
         self.side: dict = side_info
         self.current_position: str = start_pos
         self.previous_position: str = start_pos
+        self.surface = None
+        self.rectangle = None
 
     @abstractmethod
+    def move(self, to_position: str):
+        pass
+
+
+class NoPiece(Piece):
+    def __init__(self, start_pos: str, side_info: dict):
+        super().__init__(start_pos, side_info)
+
+    @override
     def move(self, to_position: str):
         pass
 
@@ -66,10 +77,11 @@ class Side:
     def __init__(self, info: dict) -> None:
         self.name = info["name"]
         self.color = info["color"]
+        self.pieces: list[Piece] = []
         self.pawns_count = 8
 
     @abstractmethod
-    def draw_pawns(self, game_screen: Surface, board: Board) -> None:
+    def draw_pieces(self, game_screen: Surface, board: Board) -> None:
         pass
 
     def move_pawn(self, board: Board) -> None:
@@ -85,15 +97,14 @@ class LightSide(Side):
         self.pawns: Pawns = Pawns(
             self.side_info, self.pawns_count, self.pawns_initial_position
         )
+        self.pieces = [pawn for pawn in self.pawns.pawns]
 
-    def draw_pawns(self, game_screen: Surface, board: Board) -> None:
+    def draw_pieces(self, game_screen: Surface, board: Board) -> None:
         for pawn in self.pawns.pawns:
-            game_screen.blit(
-                pawn.surface,
-                pawn.surface.get_rect(
-                    center=board.get_square_center(pawn.current_position)
-                ),
-            )
+            square = board.get_square(pawn.current_position)
+            pawn.rectangle = pawn.surface.get_rect(center=square.rectangle.center)
+            pawn.current_position = square.notation
+            game_screen.blit(pawn.surface, pawn.rectangle)
 
 
 class DarkSide(Side):
@@ -105,12 +116,41 @@ class DarkSide(Side):
         self.pawns: Pawns = Pawns(
             self.side_info, self.pawns_count, self.pawns_initial_position
         )
+        self.pieces = [pawn for pawn in self.pawns.pawns]
 
-    def draw_pawns(self, game_screen: Surface, board: Board) -> None:
+    def draw_pieces(self, game_screen: Surface, board: Board) -> None:
         for pawn in self.pawns.pawns:
-            game_screen.blit(
-                pawn.surface,
-                pawn.surface.get_rect(
-                    center=board.get_square_center(pawn.current_position)
-                ),
-            )
+            square = board.get_square(pawn.current_position)
+            pawn.rectangle = pawn.surface.get_rect(center=square.rectangle.center)
+            pawn.current_position = square.notation
+            game_screen.blit(pawn.surface, pawn.rectangle)
+
+
+class Game:
+    nopiece = NoPiece("#", {""})
+
+    def __init__(self):
+        self.light_side = LightSide({"name": "light", "color": "#000000"})
+        self.dark_side = DarkSide({"name": "dark", "color": "#111111"})
+        self.all_pieces = self.light_side.pieces + self.dark_side.pieces
+
+    def draw_pawns(self, game_screen, board):
+        self.light_side.draw_pieces(game_screen, board)
+        self.dark_side.draw_pieces(game_screen, board)
+
+    def move(self, from_square, to_square):
+        # get the pawn on the previously clicked square, then change the position to the new square
+        pass
+
+    def get_selected_piece(self, board, clicked_position):
+        print(
+            f"pieces size {len(self.all_pieces)},{board.get_clicked_square(clicked_position).rectangle.width} clickedposition {clicked_position}"
+        )
+        for piece in self.all_pieces:
+            # print(
+            #     f"piece position {piece.current_position}, rectangle {piece.rectangle.top}, {piece.rectangle.left}, {piece.rectangle.bottom}, {piece.rectangle.right},  size {piece.rectangle.width}, {piece.rectangle.height}"
+            # )
+            if piece.rectangle.collidepoint(clicked_position):
+                print(f"Clicked piece {piece.current_position}, {piece.side}")
+                return piece
+        return self.nopiece

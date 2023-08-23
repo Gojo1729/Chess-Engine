@@ -48,6 +48,7 @@ class Board:
     def _precompute_squares(self):
         """
         Create a matrix of squares with properties -> rectangle, name, color
+        squares["a1"] = sq...
         """
         squares = {}
         for rank_index, rank_square in enumerate(self.ranks):
@@ -98,3 +99,6 @@ class Board:
 
     def get_square_center(self, notation):
         return self.squares[notation].rectangle.center
+
+    def get_square(self, notation):
+        return self.squares[notation]
